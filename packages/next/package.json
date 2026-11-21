@@ -1,0 +1,25 @@
+{
+  "name": "@three-shell/next",
+  "version": "0.1.0",
+  "description": "Automatic ThreeShell scene discovery for Next.js",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.d.mts",
+      "import": "./src/index.mjs"
+    }
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node --check src/index.mjs && node --check src/discovery.mjs",
+    "typecheck": "node --check src/index.mjs && node --check src/discovery.mjs",
+    "test": "node --test tests/*.test.mjs"
+  }
+}

@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.next/
+coverage/
+*.tsbuildinfo
+.env.local
+.DS_Store
+
+# Generated automatically on Next.js startup (do not commit)
+**/src/scenes/.generated/
