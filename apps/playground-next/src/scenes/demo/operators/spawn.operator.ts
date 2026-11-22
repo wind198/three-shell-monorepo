@@ -1,14 +1,14 @@
 import * as THREE from 'three';
 import RAPIER from '@dimforge/rapier3d-compat';
 import { Injectable, type FrameContext } from '@three-shell/core';
-import { SceneResources } from '../resources/scene-resources';
-import { PhysicsWorld } from '../physics/physics-world';
-import { EntityStore } from '../state/entity.store';
+import { SceneState } from '../state/scene.state';
+import { PhysicsState } from '../state/physics.state';
+import { EntityRegistry } from '../state/entity.registry';
 
 /** Related spawning operations are public pipeline stages, helpers remain private. */
 @Injectable()
 export class SpawnOperator {
-  constructor(private readonly store: EntityStore, private readonly physics: PhysicsWorld, private readonly scene: SceneResources) {}
+  constructor(private readonly store: EntityRegistry, private readonly physics: PhysicsState, private readonly scene: SceneState) {}
   processCommands(_ctx: FrameContext): void {
     if (this.store.commands.clearRequested) {
       this.store.clear();

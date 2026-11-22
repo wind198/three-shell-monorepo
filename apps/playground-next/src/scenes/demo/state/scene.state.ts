@@ -6,7 +6,7 @@ export const CANVAS_CONTAINER = Symbol('THREE_CANVAS_CONTAINER');
 
 /** Playground-specific owner of WebGL, event listeners, and shared GPU resources. */
 @Injectable()
-export class SceneResources {
+export class SceneState {
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
   renderer!: THREE.WebGLRenderer;

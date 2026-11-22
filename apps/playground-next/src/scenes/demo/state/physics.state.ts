@@ -3,7 +3,7 @@ import { Injectable } from '@three-shell/core';
 
 /** World is mutable and owned by this provider, not the Rapier adapter. */
 @Injectable()
-export class PhysicsWorld {
+export class PhysicsState {
   world!: RAPIER.World;
   async onSceneInit(): Promise<void> {
     await RAPIER.init();

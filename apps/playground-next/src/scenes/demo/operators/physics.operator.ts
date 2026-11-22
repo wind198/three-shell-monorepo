@@ -1,10 +1,10 @@
 import { Injectable, type FrameContext } from '@three-shell/core';
-import { PhysicsWorld } from '../physics/physics-world';
-import { EntityStore } from '../state/entity.store';
+import { PhysicsState } from '../state/physics.state';
+import { EntityRegistry } from '../state/entity.registry';
 
 @Injectable()
 export class PhysicsOperator {
-  constructor(private readonly physics: PhysicsWorld, private readonly store: EntityStore) {}
+  constructor(private readonly physics: PhysicsState, private readonly store: EntityRegistry) {}
   capturePreviousTransforms(_ctx: FrameContext): void {
     for (const entity of this.store.entities.values()) {
       const pos = entity.body.translation(), rot = entity.body.rotation();

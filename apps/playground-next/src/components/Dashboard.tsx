@@ -2,13 +2,13 @@
 import { useRef, useState } from 'react';
 import { SceneView } from '../scenes/.generated/registry';
 import type { ThreeApplication, FrameContext } from '@three-shell/core';
-import type { EntityStore } from '../scenes/demo/state/entity.store';
+import type { EntityRegistry } from '../scenes/demo/state/entity.registry';
 
 
 type Controller = ThreeApplication<FrameContext>;
 export function Dashboard() {
   const controller = useRef<Controller | null>(null);
-  const entityStore = useRef<EntityStore | null>(null);
+  const entityStore = useRef<EntityRegistry | null>(null);
   const [status, setStatus] = useState('Initializing');
   const [metrics, setMetrics] = useState({ fps: 0, objects: 0 });
   const [auto, setAuto] = useState(true);
@@ -17,8 +17,8 @@ export function Dashboard() {
   const store = () => entityStore.current;
   const readyHandler = (instance: Controller) => {
     controller.current = instance;
-    void import('../scenes/demo/state/entity.store').then(({ EntityStore }) => {
-      if (controller.current === instance) { entityStore.current = instance.resolve(EntityStore); setStatus('Running'); }
+    void import('../scenes/demo/state/entity.registry').then(({ EntityRegistry }) => {
+      if (controller.current === instance) { entityStore.current = instance.resolve(EntityRegistry); setStatus('Running'); }
     }).catch(error => { if (controller.current === instance) { console.error(error); setStatus('Failed'); } });
   };
   const disposeHandler = () => { controller.current = null; entityStore.current = null; setStatus('Initializing'); };

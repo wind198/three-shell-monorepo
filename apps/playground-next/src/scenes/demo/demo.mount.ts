@@ -1,6 +1,6 @@
 import type { Provider } from '@three-shell/core';
-import { CANVAS_CONTAINER } from './resources/scene-resources';
-import { METRICS_CALLBACK, type MetricsCallback } from './demo.scene';
+import { CANVAS_CONTAINER } from './state/scene.state';
+import { METRICS_CALLBACK, type MetricsCallback } from './state/metrics.state';
 
 /** Optional scene-specific bootstrap tokens. No React imports or view components. */
 export function createMountProviders(container: HTMLElement, getProps: () => object): Provider[] {
