@@ -1,0 +1,28 @@
+name: World Composer
+on:
+  pull_request:
+    paths:
+      - 'apps/world-composer/**'
+      - 'packages/world-composition/**'
+      - 'packages/world-assets/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/world-composer.yml'
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.20.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm --filter @three-shell/world-assets typecheck
+      - run: pnpm --filter @three-shell/world-composition typecheck
+      - run: pnpm --filter @three-shell/world-composition test
+      - run: pnpm --filter @three-shell/world-composer typecheck
+      - run: pnpm --filter @three-shell/world-composer test
+      - run: pnpm --filter @three-shell/world-composer build
