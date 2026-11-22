@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "template": "city-cross",
+  "options": {
+    "rowCount": 3,
+    "roadWidth": 7,
+    "sidewalkWidth": 2,
+    "buildingWidth": 3.6,
+    "buildingDepth": 5.8,
+    "buildingGap": 0.14,
+    "floors": 3,
+    "showStreetFurniture": true
+  }
+}
