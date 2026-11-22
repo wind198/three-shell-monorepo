@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { CityCrossDocument, CityCrossOptions } from '../types';
 import { box, matte, PALETTE, positive, streetLamp, tree, whole } from '../primitives';
+import { createSidewalkSegment } from './sidewalk';
 import { createShophouseRow } from './shophouse';
 import { createRoadCross } from './road-cross';
 import { setAnchors } from '../anchors';
@@ -35,8 +36,6 @@ export function createCityCross(options: CityCrossOptions = {}): THREE.Group {
   group.userData.template = 'city-cross';
   group.userData.options = { ...options, rowCount, roadWidth, sidewalkWidth, buildingWidth, buildingDepth, buildingGap, floors };
   const ground = matte('#bfd8b9');
-  const pavement = matte('#e8e2d3');
-  const curbMaterial = matte('#b7bec1');
   box(group,'Terrain',[0,-.16,0],[span+.5,.22,span+.5],ground);
 
   const road = createRoadCross({roadWidth,span});
@@ -52,11 +51,12 @@ export function createCityCross(options: CityCrossOptions = {}): THREE.Group {
       block.name = 'Block-'+(zSide>0?'North':'South')+'-'+(xSide>0?'East':'West');
       block.userData.template = 'city-block';
       block.position.set(xSide*xCenter,0,zSide*zCenter);
-      const sidewalk = new THREE.Group();
+      const sidewalk = createSidewalkSegment({
+        length: rowWidth + .6, depth: sidewalkWidth,
+        height: sidewalkY, curbSide: zSide === 1 ? 'back' : 'front',
+      });
       sidewalk.name = 'Sidewalk';
-      sidewalk.position.set(0,0, -zSide*(buildingDepth/2+sidewalkWidth/2));
-      box(sidewalk,'Pavement',[0,sidewalkY/2,0],[rowWidth+.6,sidewalkY,sidewalkWidth],pavement);
-      box(sidewalk,'Curb',[0,.035,-zSide*(sidewalkWidth/2-.06)],[rowWidth+.6,.075,.12],curbMaterial);
+      sidewalk.position.set(0, 0, -zSide * (buildingDepth / 2 + sidewalkWidth / 2));
       block.add(sidewalk);
 
       const row = createShophouseRow({

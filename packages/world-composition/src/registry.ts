@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { CompositionNode, AssemblyFactory } from './types';
 import { applyTransform } from './anchors';
 import { createShophouse, createShophouseRow } from './assemblies/shophouse';
+import { createSidewalkSegment } from './assemblies/sidewalk';
 import { createRoadCross } from './assemblies/road-cross';
 import { createCityCross } from './assemblies/city-cross';
 
@@ -27,6 +28,7 @@ export function createDefaultRegistry(): CompositionRegistry {
   return new CompositionRegistry()
     .register('shophouse',createShophouse)
     .register('shophouse-row',createShophouseRow)
+    .register('sidewalk-segment',createSidewalkSegment)
     .register('road-cross',createRoadCross)
     .register('city-cross',createCityCross);
 }

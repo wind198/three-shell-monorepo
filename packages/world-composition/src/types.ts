@@ -30,6 +30,13 @@ export interface ShophouseRowOptions extends ShophouseOptions {
   shops?: readonly ShopType[];
   floorPattern?: readonly number[];
 }
+export interface SidewalkOptions {
+  length?: number;
+  depth?: number;
+  height?: number;
+  curbSide?: 'front' | 'back';
+  color?: SurfaceColor;
+}
 export interface RoadCrossOptions {
   roadWidth?: number;
   span?: number;

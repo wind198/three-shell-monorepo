@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { describe, it, expect } from 'vitest';
 import {
- createCityCross, createRoadCross, createShophouse, createShophouseRow,
+ createCityCross, createRoadCross, createSidewalkSegment, createShophouse, createShophouseRow,
  createDefaultRegistry, applyTransform, anchorWorld, snapAnchors, disposeAssembly,
 } from '../src';
 
@@ -19,6 +19,17 @@ describe('typed assembly factories', () => {
   expect(size.y).toBeGreaterThan(7);
   expect(bounds.min.y).toBeGreaterThanOrEqual(-.001);
   disposeAssembly(house);
+ });
+ it('makes snap-compatible sidewalk modules with front/back curbs',()=>{
+  const left=createSidewalkSegment({length:4,depth:2,curbSide:'front'});
+  const right=createSidewalkSegment({length:4,depth:2,curbSide:'back'});
+  expect(left.getObjectByName('StreetCurb')?.position.z).toBeGreaterThan(0);
+  expect(right.getObjectByName('StreetCurb')?.position.z).toBeLessThan(0);
+  const group=new THREE.Group();
+  group.add(left,right);
+  snapAnchors(right,'left-end',left,'right-end');
+  expect(anchorWorld(right,'left-end').distanceTo(anchorWorld(left,'right-end'))).toBeLessThan(1e-5);
+  disposeAssembly(group);
  });
  it('positions exactly N shophouses in a row', () => {
   const group=createShophouseRow({count:4,width:3,gap:.2,floors:2});
