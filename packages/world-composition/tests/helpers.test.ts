@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
-import { add, group, place, repeat, rotate, row, stack } from '../src/assembly';
+import { add, group, place, repeat, rotate, row, stack } from '../src/helpers';
 
 describe('thin Three.js assembly helpers', () => {
   it('creates named groups and attaches actual object instances', () => {

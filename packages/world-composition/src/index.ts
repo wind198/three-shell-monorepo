@@ -1,4 +1,5 @@
 export * from './types';
+export { group, add, place, rotate, repeat, row, stack } from './helpers';
 export * from './anchors';
 export { disposeAssembly, PALETTE } from './primitives';
 export { createShophouse, createShophouseRow } from './assemblies/shophouse';

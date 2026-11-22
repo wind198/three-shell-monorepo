@@ -14,10 +14,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    },
-    "./assembly": {
-      "types": "./dist/assembly.d.ts",
-      "import": "./dist/assembly.js"
     }
   },
   "scripts": {
@@ -29,17 +25,8 @@
   "dependencies": {
     "reflect-metadata": "^0.2.2"
   },
-  "peerDependencies": {
-    "three": "^0.187.0"
-  },
+  "peerDependencies": {},
   "devDependencies": {
-    "rimraf": "^6.0.0",
-    "three": "0.187.0",
-    "@types/three": "^0.187.0"
-  },
-  "peerDependenciesMeta": {
-    "three": {
-      "optional": true
-    }
+    "rimraf": "^6.0.0"
   }
 }

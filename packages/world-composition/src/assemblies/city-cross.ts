@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { add, group as createGroup, place, rotate } from '@three-shell/core/assembly';
+import { add, group as createGroup, place, rotate } from '../helpers';
 import type { CityCrossDocument, CityCrossOptions } from '../types';
 import { box, matte, PALETTE, positive, streetLamp, tree, whole } from '../primitives';
 import { createSidewalkSegment } from './sidewalk';

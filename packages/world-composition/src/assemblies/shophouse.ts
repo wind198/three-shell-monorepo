@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { add, place, repeat, row } from '@three-shell/core/assembly';
+import { add, place, repeat, row } from '../helpers';
 import { createDoor } from '@three-shell/world-assets/architecture/door';
 import { createWindow } from '@three-shell/world-assets/architecture/window';
 import { createAwning } from '@three-shell/world-assets/architecture/awning';
@@ -31,10 +31,16 @@ export function createShophouse(options: ShophouseOptions = {}): THREE.Group {
 
   box(group, 'MainBody', [0, overallHeight/2-.11, 0],
     [width, overallHeight-.22, depth], primary);
-  box(group, 'SideTrimLeft', [-width*.48, overallHeight/2, 0],
-    [width*.04, overallHeight, depth], secondary);
-  box(group, 'SideTrimRight', [width*.48, overallHeight/2, 0],
-    [width*.04, overallHeight, depth], secondary);
+  // Front-only pilasters. Previously the full-depth trims ended exactly on the
+  // MainBody side faces (x=±width/2), producing coplanar triangles and z-fighting.
+  // Keep all trim faces strictly in front of the structural shell.
+  const trimWidth = width * .045;
+  const trimDepth = .075;
+  const trimZ = facing + trimDepth / 2 + .012;
+  box(group, 'SideTrimLeft', [-width/2 + trimWidth/2 + .015, overallHeight/2, trimZ],
+    [trimWidth, overallHeight, trimDepth], secondary);
+  box(group, 'SideTrimRight', [width/2 - trimWidth/2 - .015, overallHeight/2, trimZ],
+    [trimWidth, overallHeight, trimDepth], secondary);
   for (let level = 1; level < floors; level++) {
     const y = level * floorHeight;
     box(group, 'FloorBand-' + level, [0, y, facing+.025], [width, .085, .075], secondary);

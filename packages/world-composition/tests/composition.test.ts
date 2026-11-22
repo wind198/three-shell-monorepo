@@ -31,6 +31,18 @@ describe('typed assembly factories', () => {
   expect(anchorWorld(right,'left-end').distanceTo(anchorWorld(left,'right-end'))).toBeLessThan(1e-5);
   disposeAssembly(group);
  });
+ it('does not put shophouse side trim on the structural wall planes', () => {
+  const house=createShophouse({width:3.6,depth:5.8,floors:3});
+  const body=house.getObjectByName('MainBody') as THREE.Mesh;
+  const trim=house.getObjectByName('SideTrimRight') as THREE.Mesh;
+  expect(body).toBeTruthy();
+  expect(trim).toBeTruthy();
+  const bodyBox=new THREE.Box3().setFromObject(body);
+  const trimBox=new THREE.Box3().setFromObject(trim);
+  expect(trimBox.min.z).toBeGreaterThan(bodyBox.max.z+.001);
+  expect(trimBox.max.x).toBeLessThan(bodyBox.max.x-.001);
+  disposeAssembly(house);
+ });
  it('positions exactly N shophouses in a row', () => {
   const group=createShophouseRow({count:4,width:3,gap:.2,floors:2});
   expect(group.children).toHaveLength(4);

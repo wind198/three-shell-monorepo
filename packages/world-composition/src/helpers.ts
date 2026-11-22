@@ -1,8 +1,4 @@
-/**
- * Thin Three.js assembly helpers. No configuration engine or separate runtime.
- * Available as @three-shell/core/assembly so host-neutral core APIs stay independent.
- * Each call uses ordinary Three.js objects and returns them for further imperative edits.
- */
+/** Thin imperative layout helpers for composing world assets. No runtime or schema. */
 import * as THREE from 'three';
 
 type Object = THREE.Object3D;
