@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { describe, it, expect } from 'vitest';
 import {
  createCityCross, createRoadCross, createSidewalkSegment, createShophouse, createShophouseRow,
- createDefaultRegistry, applyTransform, anchorWorld, snapAnchors, disposeAssembly,
+ createDefaultRegistry, applyTransform, anchorWorld, snapAnchors, disposeAssembly, createInsideShophouse,
 } from '../src';
 
 describe('typed assembly factories', () => {
@@ -95,5 +95,28 @@ describe('snap anchors',()=>{
   expect(anchorWorld(b,'west').distanceTo(anchorWorld(a,'east'))).toBeLessThan(1e-5);
   disposeAssembly(a);
   disposeAssembly(b);
+ });
+});
+
+describe('inside shophouse coffee shop',()=>{
+ it('has an open-roof cutaway with distinct furniture zones',()=>{
+  const cafe=createInsideShophouse();
+  expect(cafe.getObjectByName('FloorSlab')).toBeTruthy();
+  expect(cafe.getObjectByName('BackWall')).toBeTruthy();
+  expect(cafe.getObjectByName('LeftWall')).toBeTruthy();
+  expect(cafe.getObjectByName('Roof')).toBeUndefined();
+  expect(cafe.getObjectByName('ServiceCounter')).toBeTruthy();
+  expect(cafe.getObjectByName('EspressoMachine')).toBeTruthy();
+  expect(cafe.getObjectByName('CafeSeating')?.children.length).toBe(3);
+  expect(cafe.getObjectByName('Lounge')).toBeTruthy();
+  disposeAssembly(cafe);
+ });
+ it('supports adjusting seat count and omitting decoration',()=>{
+  const cafe=createInsideShophouse({tableCount:5,showLounge:false,showDecor:false});
+  expect(cafe.getObjectByName('CafeSeating')?.children.length).toBe(5);
+  expect(cafe.getObjectByName('Lounge')).toBeUndefined();
+  expect(cafe.getObjectByName('PendantShade')).toBeUndefined();
+  expect(()=>createInsideShophouse({width:4})).toThrow(RangeError);
+  disposeAssembly(cafe);
  });
 });

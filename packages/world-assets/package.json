@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./architecture/*": "./src/upstream/architecture/*.ts"
+    "./architecture/*": "./src/upstream/architecture/*.ts",
+    "./interior/cafe": "./src/interior/cafe.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
