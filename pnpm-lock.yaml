@@ -159,6 +159,9 @@ importers:
 
   packages/world-composition:
     dependencies:
+      '@three-shell/core':
+        specifier: workspace:*
+        version: link:../core
       '@three-shell/world-assets':
         specifier: workspace:*
         version: link:../world-assets
@@ -182,6 +185,12 @@ importers:
         specifier: ^0.2.2
         version: 0.2.2
     devDependencies:
+      '@types/three':
+        specifier: ^0.187.0
+        version: 0.187.0
+      three:
+        specifier: 0.187.0
+        version: 0.187.0
       rimraf:
         specifier: ^6.0.0
         version: 6.1.4

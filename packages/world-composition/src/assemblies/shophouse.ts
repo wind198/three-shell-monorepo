@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { add, group, place, repeat, row } from '@three-shell/core/assembly';
 import { createDoor } from '@three-shell/world-assets/architecture/door';
 import { createWindow } from '@three-shell/world-assets/architecture/window';
 import { createAwning } from '@three-shell/world-assets/architecture/awning';
@@ -51,8 +52,7 @@ export function createShophouse(options: ShophouseOptions = {}): THREE.Group {
     secondaryColor: options.primaryColor ?? PALETTE.cream,
   });
   facade.name = 'GroundFloorStorefront';
-  facade.position.set(0, 0, facing+.12);
-  group.add(facade);
+  add(group, place(facade, 0, 0, facing+.12));
 
   const door = createDoor({
     variant: 'single', width: width*.20, depth: .10, height: floorHeight*.70,
@@ -60,8 +60,7 @@ export function createShophouse(options: ShophouseOptions = {}): THREE.Group {
     secondaryColor: PALETTE.white,
   });
   door.name = 'EntranceDoor';
-  door.position.set(0, 0, facing+.25);
-  group.add(door);
+  add(group, place(door, 0, 0, facing+.25));
 
   const awning = createAwning({
     variant: shop === 'office' ? 'flat' : 'sloped',
@@ -70,8 +69,7 @@ export function createShophouse(options: ShophouseOptions = {}): THREE.Group {
     secondaryColor: PALETTE.cream,
   });
   awning.name = 'EntranceAwning';
-  awning.position.set(0, floorHeight*.88, facing+.38);
-  group.add(awning);
+  add(group, place(awning, 0, floorHeight*.88, facing+.38));
 
   for (let level = 1; level < floors; level++) {
     const centerY = level * floorHeight + floorHeight*.31;
@@ -82,8 +80,7 @@ export function createShophouse(options: ShophouseOptions = {}): THREE.Group {
         secondaryColor: options.secondaryColor ?? PALETTE.oak,
       });
       window.name = 'Window-' + level + '-' + side;
-      window.position.set(side*width*.245, centerY, facing+.10);
-      group.add(window);
+      add(group, place(window, side*width*.245, centerY, facing+.10));
     }
     box(group, 'BalconyBand-' + level, [0, level*floorHeight+.12, facing+.21],
       [width*.82, .105, .32], secondary);
@@ -105,23 +102,22 @@ export function createShophouseRow(options: ShophouseRowOptions = {}): THREE.Gro
   const gap = options.gap ?? .15;
   if (!Number.isFinite(gap) || gap < 0) throw new RangeError('gap must be non-negative');
   const depth = positive('depth', options.depth ?? 5.8);
-  const row = new THREE.Group();
-  row.name = 'ShophouseRow';
-  row.userData.template = 'shophouse-row';
-  const rowWidth = count*width + (count-1)*gap;
-  for(let i=0;i<count;i++){
-    const floorCount = options.floorPattern?.[i % (options.floorPattern.length || 1)] ?? options.floors ?? 3;
-    const shop = options.shops?.[i % (options.shops.length || 1)] ?? SHOPS[i % SHOPS.length];
+  const children = repeat(count, index => {
+    const floorCount = options.floorPattern?.[index % (options.floorPattern.length || 1)] ?? options.floors ?? 3;
+    const shop = options.shops?.[index % (options.shops.length || 1)] ?? SHOPS[index % SHOPS.length];
     const child = createShophouse({ ...options, width, depth, floors: floorCount, shop });
-    child.name = 'Shophouse-' + (i+1);
-    child.userData.index = i;
-    child.position.x = -rowWidth/2+width/2+i*(width+gap);
-    row.add(child);
-  }
-  row.userData.count = count;
-  setAnchors(row, {
+    child.name = 'Shophouse-' + (index+1);
+    child.userData.index = index;
+    return child;
+  });
+  const assembled = row(children, width + gap);
+  const root = group('ShophouseRow', ...assembled.children.slice());
+  root.userData.template = 'shophouse-row';
+  const rowWidth = count*width + (count-1)*gap;
+  root.userData.count = count;
+  setAnchors(root, {
     'front-center':[0,0,depth/2], 'back-center':[0,0,-depth/2],
     'row-start':[-rowWidth/2,0,0], 'row-end':[rowWidth/2,0,0],
   });
-  return row;
+  return root;
 }

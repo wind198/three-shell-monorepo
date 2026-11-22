@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { add, group, place, rotate } from '@three-shell/core/assembly';
 import type { CityCrossDocument, CityCrossOptions } from '../types';
 import { box, matte, PALETTE, positive, streetLamp, tree, whole } from '../primitives';
 import { createSidewalkSegment } from './sidewalk';
@@ -16,6 +17,7 @@ export const DEFAULT_CITY_CROSS: CityCrossDocument = {
 };
 const SHOPS = ['cafe','retail','office'] as const;
 const COLORS = [PALETTE.cream, PALETTE.mint, PALETTE.coral, PALETTE.sky];
+const groupName = (name: string) => group(name);
 
 /** Four quadrant shophouse rows around a connected plus-shaped intersection. */
 export function createCityCross(options: CityCrossOptions = {}): THREE.Group {
@@ -39,7 +41,7 @@ export function createCityCross(options: CityCrossOptions = {}): THREE.Group {
   box(group,'Terrain',[0,-.16,0],[span+.5,.22,span+.5],ground);
 
   const road = createRoadCross({roadWidth,span});
-  group.add(road);
+  add(group, road);
   const sidewalkY = .115;
   const xCenter = roadWidth/2 + sidewalkWidth + rowWidth/2;
   const zCenter = roadWidth/2 + sidewalkWidth + buildingDepth/2;
@@ -47,17 +49,15 @@ export function createCityCross(options: CityCrossOptions = {}): THREE.Group {
   // They face the nearby roadway; north blocks rotate 180 degrees.
   for (const zSide of [-1,1]) {
     for (const xSide of [-1,1]) {
-      const block = new THREE.Group();
-      block.name = 'Block-'+(zSide>0?'North':'South')+'-'+(xSide>0?'East':'West');
+      const block = groupName('Block-'+(zSide>0?'North':'South')+'-'+(xSide>0?'East':'West'));
       block.userData.template = 'city-block';
-      block.position.set(xSide*xCenter,0,zSide*zCenter);
+      place(block, xSide*xCenter, 0, zSide*zCenter);
       const sidewalk = createSidewalkSegment({
         length: rowWidth + .6, depth: sidewalkWidth,
         height: sidewalkY, curbSide: zSide === 1 ? 'back' : 'front',
       });
       sidewalk.name = 'Sidewalk';
-      sidewalk.position.set(0, 0, -zSide * (buildingDepth / 2 + sidewalkWidth / 2));
-      block.add(sidewalk);
+      add(block, place(sidewalk, 0, 0, -zSide * (buildingDepth / 2 + sidewalkWidth / 2)));
 
       const row = createShophouseRow({
         count:rowCount, width:buildingWidth, depth:buildingDepth,
@@ -67,21 +67,17 @@ export function createCityCross(options: CityCrossOptions = {}): THREE.Group {
         secondaryColor:PALETTE.oak,
       });
       row.name = 'StorefrontRow';
-      row.position.y = sidewalkY;
-      row.rotation.y = zSide===1?Math.PI:0;
-      block.add(row);
+      add(block, rotate(place(row, 0, sidewalkY, 0), 0, zSide===1?Math.PI:0, 0));
       if(options.showStreetFurniture!==false) {
         const streetEdgeZ = -zSide*(buildingDepth/2+sidewalkWidth*.54);
         for (const x of [-rowWidth*.36,rowWidth*.36]) {
           const plant = tree('PlanterTree',1.75);
-          plant.position.set(x,sidewalkY,streetEdgeZ);
-          block.add(plant);
+          add(block, place(plant, x, sidewalkY, streetEdgeZ));
         }
         const lamp = streetLamp();
-        lamp.position.set(xSide*rowWidth*.47, sidewalkY, streetEdgeZ);
-        block.add(lamp);
+        add(block, place(lamp, xSide*rowWidth*.47, sidewalkY, streetEdgeZ));
       }
-      group.add(block);
+      add(group, block);
     }
   }
   setAnchors(group,{
