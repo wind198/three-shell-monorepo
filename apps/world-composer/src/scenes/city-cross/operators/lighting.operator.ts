@@ -15,7 +15,8 @@ export class LightingOperator {
   const p=presets[env.time];
   this.scene.sun.color.set(p.color);
   this.scene.sun.intensity=p.power;
-  this.scene.sun.position.set(...p.sun);
+  const [sunX, sunY, sunZ] = p.sun;
+  this.scene.sun.position.set(sunX, sunY, sunZ);
   this.scene.ambient.intensity=p.ambient;
   (this.scene.scene.background as THREE.Color).set(p.bg);
   this.scene.grid.visible=env.showGrid;

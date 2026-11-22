@@ -6,7 +6,7 @@ export interface TransformSpec {
   rotation?: Vec3; // Euler radians in XYZ order.
   scale?: Vec3;
 }
-export interface CompositionNode<T extends string = string, P = Record<string, unknown>> {
+export interface CompositionNode<T extends string = string, P = unknown> {
   id: string;
   template: T;
   props: P;
