@@ -3,6 +3,7 @@ import * as THREE from 'three';
 /** Reusable, roofless-friendly low-poly coffee furniture. +Y up, local origin on floor. */
 const CUBE = new THREE.BoxGeometry(1,1,1);
 const ROUND = new THREE.CylinderGeometry(1,1,1,12);
+const LEAF = new THREE.IcosahedronGeometry(.32,0);
 const matte = (color:THREE.ColorRepresentation) => new THREE.MeshStandardMaterial({color,roughness:1,metalness:0});
 function block(root:THREE.Group, name:string, xyz:readonly [number,number,number], size:readonly [number,number,number], material:THREE.Material) {
  const mesh=new THREE.Mesh(CUBE,material);
@@ -68,7 +69,7 @@ export function createCafePlanter():THREE.Group {
  cylinder(root,'Pot',[0,.27,0],.26,.54,pot);
  cylinder(root,'Stem',[0,.72,0],.055,.48,stem);
  for (const [i,x,z] of [[0,-.22,.1],[1,.18,-.12],[2,.08,.23]] as const){
-   const leafMesh=new THREE.Mesh(new THREE.IcosahedronGeometry(.32,0),leaf);
+   const leafMesh=new THREE.Mesh(LEAF,leaf);
    leafMesh.name='Leaves-'+i;leafMesh.position.set(x,1.02+(i%2)*.13,z);
    leafMesh.castShadow=true;leafMesh.receiveShadow=true;root.add(leafMesh);
  }
