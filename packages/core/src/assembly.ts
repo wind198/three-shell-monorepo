@@ -11,7 +11,7 @@ type Object = THREE.Object3D;
 export function group(name: string, ...children: readonly Object[]): THREE.Group {
   const root = new THREE.Group();
   root.name = name;
-  root.add(...children);
+  if (children.length) root.add(...children);
   return root;
 }
 
