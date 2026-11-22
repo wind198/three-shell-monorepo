@@ -12,7 +12,7 @@
     "scene:sync": "node tools/scene-cli/bin/three-shell-scene.mjs sync",
     "scene:list": "node tools/scene-cli/bin/three-shell-scene.mjs list",
     "test:cli": "node --test tools/scene-cli/tests/*.test.mjs",
-    "dev:lighting-room": "pnpm --filter @three-shell/lighting-room dev",
+    "dev:lighting-room": "pnpm build && pnpm --filter @three-shell/lighting-room dev",
     "test:assets": "node --test tools/asset-discovery/tests/*.test.mjs"
   },
   "devDependencies": {
