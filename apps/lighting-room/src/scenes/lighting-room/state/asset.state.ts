@@ -22,15 +22,19 @@ export class AssetState {
  private disposeCurrent(): void {
    if (!this.current) return;
    this.scene.assetMount.remove(this.current);
+   this.disposeGroup(this.current);
+   this.current = null;
+ }
+ /** Per-instance materials belong to the group; source geometry is shared. */
+ disposeGroup(group: THREE.Group): void {
    const materials = new Set<THREE.Material>();
-   this.current.traverse(object => {
+   group.traverse(object => {
      if (object instanceof THREE.Mesh) {
        const entries = Array.isArray(object.material) ? object.material : [object.material];
        for (const material of entries) materials.add(material);
      }
    });
    for (const material of materials) material.dispose();
-   this.current = null;
  }
  onSceneDestroy(): void {
    this.destroyed = true;

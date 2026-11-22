@@ -17,6 +17,9 @@ importers:
 
   apps/lighting-room:
     dependencies:
+      '@three-shell/world-composition':
+        specifier: workspace:*
+        version: link:../../packages/world-composition
       '@three-shell/core':
         specifier: workspace:*
         version: link:../../packages/core

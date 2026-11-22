@@ -56,7 +56,7 @@ export class SceneState {
    this.scene.add(this.keyLight, this.keyLight.target);
 
    this.floor = new THREE.Mesh(
-     new THREE.PlaneGeometry(40, 40),
+     new THREE.PlaneGeometry(220, 220),
      new THREE.MeshStandardMaterial({ color: '#eee8dc', roughness: 1, metalness: 0 }),
    );
    this.floor.rotation.x = -Math.PI / 2;
@@ -64,7 +64,7 @@ export class SceneState {
    this.floor.receiveShadow = true;
    this.floor.name = 'InspectionFloor';
    this.scene.add(this.floor);
-   this.grid = new THREE.GridHelper(20, 20, '#a9a39a', '#d8d1c5');
+   this.grid = new THREE.GridHelper(220, 110, '#a9a39a', '#d8d1c5');
    this.grid.position.y = .002;
    this.grid.visible = false;
    this.scene.add(this.grid);
@@ -76,7 +76,7 @@ export class SceneState {
    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
    this.controls.enableDamping = true;
    this.controls.dampingFactor = .08;
-   this.controls.minZoom = .15;
+   this.controls.minZoom = .01;
    this.controls.maxZoom = 12;
    this.controls.target.set(0, 1, 0);
    this.controls.update();

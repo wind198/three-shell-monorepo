@@ -1,11 +1,14 @@
 export type LightPreset = 'studio' | 'daylight' | 'warm' | 'neutral';
+export interface InspectionOptions {
+  variant?: string;
+  width?: number; depth?: number; height?: number;
+  floors?: number; count?: number; roadWidth?: number; rowCount?: number;
+  sidewalkWidth?: number;
+  primaryColor: string; secondaryColor: string;
+}
 export interface RoomConfig {
   assetId: string;
-  options: {
-    variant?: string;
-    width?: number; depth?: number; height?: number;
-    primaryColor: string; secondaryColor: string;
-  };
+  options: InspectionOptions;
   lighting: {
     preset: LightPreset; intensity: number; ambientIntensity: number;
     color: string; azimuth: number; elevation: number; shadows: boolean;

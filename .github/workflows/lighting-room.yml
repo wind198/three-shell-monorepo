@@ -22,6 +22,8 @@ jobs:
       - run: pnpm build
       - run: node --test tools/asset-discovery/tests/*.test.mjs
       - run: pnpm --filter @three-shell/world-assets typecheck
+      - run: pnpm --filter @three-shell/world-composition typecheck
+      - run: pnpm --filter @three-shell/world-composition test
       - run: pnpm --filter @three-shell/lighting-room typecheck
       - run: pnpm --filter @three-shell/lighting-room test
       - run: pnpm --filter @three-shell/lighting-room build
