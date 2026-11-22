@@ -1,0 +1,22 @@
+{
+  "name": "@three-shell/world-assets",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./architecture/*": "./src/upstream/architecture/*.ts",
+    "./interior/cafe": "./src/interior/cafe.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.187.0",
+    "typescript": "~5.9.3"
+  }
+}

@@ -1,0 +1,29 @@
+name: Lighting Room
+on:
+  pull_request:
+    paths:
+      - 'apps/lighting-room/**'
+      - 'packages/world-assets/**'
+      - 'tools/asset-discovery/**'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
+      - '.github/workflows/lighting-room.yml'
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.20.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: node --test tools/asset-discovery/tests/*.test.mjs
+      - run: pnpm --filter @three-shell/world-assets typecheck
+      - run: pnpm --filter @three-shell/world-composition typecheck
+      - run: pnpm --filter @three-shell/world-composition test
+      - run: pnpm --filter @three-shell/lighting-room typecheck
+      - run: pnpm --filter @three-shell/lighting-room test
+      - run: pnpm --filter @three-shell/lighting-room build
