@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { add, group, place, repeat, row } from '@three-shell/core/assembly';
+import { add, place, repeat, row } from '@three-shell/core/assembly';
 import { createDoor } from '@three-shell/world-assets/architecture/door';
 import { createWindow } from '@three-shell/world-assets/architecture/window';
 import { createAwning } from '@three-shell/world-assets/architecture/awning';
@@ -110,8 +110,8 @@ export function createShophouseRow(options: ShophouseRowOptions = {}): THREE.Gro
     child.userData.index = index;
     return child;
   });
-  const assembled = row(children, width + gap);
-  const root = group('ShophouseRow', ...assembled.children.slice());
+  const root = row(children, width + gap);
+  root.name = 'ShophouseRow';
   root.userData.template = 'shophouse-row';
   const rowWidth = count*width + (count-1)*gap;
   root.userData.count = count;

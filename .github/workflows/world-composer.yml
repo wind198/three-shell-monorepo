@@ -20,6 +20,7 @@ jobs:
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - run: pnpm --filter @three-shell/core test
       - run: pnpm --filter @three-shell/world-assets typecheck
       - run: pnpm --filter @three-shell/world-composition typecheck
       - run: pnpm --filter @three-shell/world-composition test

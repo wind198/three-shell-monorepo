@@ -17,7 +17,6 @@ export const DEFAULT_CITY_CROSS: CityCrossDocument = {
 };
 const SHOPS = ['cafe','retail','office'] as const;
 const COLORS = [PALETTE.cream, PALETTE.mint, PALETTE.coral, PALETTE.sky];
-const groupName = (name: string) => group(name);
 
 /** Four quadrant shophouse rows around a connected plus-shaped intersection. */
 export function createCityCross(options: CityCrossOptions = {}): THREE.Group {
@@ -49,7 +48,7 @@ export function createCityCross(options: CityCrossOptions = {}): THREE.Group {
   // They face the nearby roadway; north blocks rotate 180 degrees.
   for (const zSide of [-1,1]) {
     for (const xSide of [-1,1]) {
-      const block = groupName('Block-'+(zSide>0?'North':'South')+'-'+(xSide>0?'East':'West'));
+      const block = group('Block-'+(zSide>0?'North':'South')+'-'+(xSide>0?'East':'West'));
       block.userData.template = 'city-block';
       place(block, xSide*xCenter, 0, zSide*zCenter);
       const sidewalk = createSidewalkSegment({
