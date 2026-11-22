@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { assetList, type AssetDefinition } from '@three-shell/world-assets';
+import { inspectionList, type InspectionEntry } from '@/lib/inspection-catalog';
 import { SceneView } from '@/scenes/.generated/registry';
 import { DEFAULT_CONFIG, LIGHT_PRESETS, type RoomConfig, type LightPreset } from '@/lib/room-types';
 
@@ -19,9 +19,9 @@ export function LightingRoom() {
   const [category, setCategory] = useState('all');
   const [status, setStatus] = useState('Initializing renderer…');
   const [showDimensions, setShowDimensions] = useState(false);
-  const selected = assetList.find(x => x.id === config.assetId);
-  const categories = useMemo(() => ['all', ...new Set(assetList.map(x => x.category))], []);
-  const listed = useMemo(() => assetList.filter(x =>
+  const selected = inspectionList.find(x => x.id === config.assetId);
+  const categories = useMemo(() => ['all', ...new Set(inspectionList.map(x => x.category))], []);
+  const listed = useMemo(() => inspectionList.filter(x =>
     (category === 'all' || x.category === category) &&
     (x.name.toLowerCase().includes(search.toLowerCase()) || x.id.toLowerCase().includes(search.toLowerCase())),
   ), [category, search]);
@@ -35,7 +35,7 @@ export function LightingRoom() {
   const patchEnvironment = (patch: Partial<RoomConfig['environment']>) =>
     setConfig(previous => ({ ...previous, environment: { ...previous.environment, ...patch } }));
 
-  const selectAsset = (asset: AssetDefinition) => {
+  const selectAsset = (asset: InspectionEntry) => {
     setConfig(previous => ({
       ...previous, assetId: asset.id,
       options: {
@@ -60,7 +60,7 @@ export function LightingRoom() {
     </header>
     <div className="studio-layout">
       <aside className="assets-sidebar">
-        <div className="sidebar-top"><h2>Asset library</h2><span className="count">{assetList.length}</span></div>
+        <div className="sidebar-top"><h2>Assets &amp; assemblies</h2><span className="count">{inspectionList.length}</span></div>
         <label className="sr-only" htmlFor="asset-search">Search assets</label>
         <input id="asset-search" className="search" placeholder="Search components…" value={search} onChange={e => setSearch(e.target.value)} />
         <div className="category-tabs" role="group" aria-label="Asset category">
@@ -74,7 +74,7 @@ export function LightingRoom() {
           </button>)}
           {!listed.length && <div className="empty">No implemented assets in this category.</div>}
         </div>
-        <div className="sidebar-foot">Factories are discovered from TypeScript source files. Only implemented assets appear here.</div>
+        <div className="sidebar-foot">Factories are discovered from TypeScript source files. Primitive assets and reusable assemblies can both be previewed.</div>
       </aside>
       <section className="viewer-section" aria-label="Three-dimensional asset preview">
         <div className="viewport-top">
@@ -101,24 +101,43 @@ export function LightingRoom() {
       <aside className="inspector">
         <div className="inspector-heading"><h2>Inspector</h2><button className="text-button" onClick={reset}>Reset all</button></div>
         <div className="inspector-scroll">
-          <section className="panel"><h3>Asset</h3>
+          <section className="panel"><h3>{selected?.kind === 'asset' ? 'Asset' : 'Assembly'}</h3>
             <label htmlFor="asset-variant">Variant</label>
             <select id="asset-variant" value={config.options.variant ?? selected?.variants[0] ?? ''} disabled={!selected?.variants.length}
               onChange={e => patchOptions({ variant: e.target.value })}>
               {selected?.variants.length ? selected.variants.map(v => <option key={v} value={v}>{friendly(v)}</option>) : <option value="">Default</option>}
             </select>
-            <button className="disclosure" onClick={() => setShowDimensions(x => !x)} aria-expanded={showDimensions}>
-              Dimensions <span>{showDimensions ? '−' : '+'}</span>
-            </button>
-            {showDimensions && <div className="dimension-grid">
-              {(['width','depth','height'] as const).map(key => <label key={key}>{friendly(key)}
-                <input type="number" min="0.01" step="0.05" placeholder={selected?.dimensions?.[key]?.toString() ?? 'Default'}
-                  value={config.options[key] ?? ''} onChange={e => patchOptions({[key]: clampDimension(e.target.value)})} />
-              </label>)}
-              <p>Leave blank to use the asset factory default.</p>
-            </div>}
+            {(selected?.kind === 'shophouse' || selected?.kind === 'shophouse-row' || selected?.kind === 'city') &&
+              <Range label="Building floors" min={1} max={6} step={1} value={config.options.floors ?? 3}
+                onChange={v => patchOptions({floors:v})} />}
+            {selected?.kind === 'shophouse-row' &&
+              <Range label="Buildings in row" min={1} max={8} step={1} value={config.options.count ?? 3}
+                onChange={v => patchOptions({count:v})} />}
+            {selected?.kind === 'city' &&
+              <Range label="Shops per block" min={1} max={8} step={1} value={config.options.rowCount ?? 3}
+                onChange={v => patchOptions({rowCount:v})} />}
+            {(selected?.kind === 'city' || selected?.kind === 'road') &&
+              <Range label="Road width" min={4} max={16} step={.5} value={config.options.roadWidth ?? 7}
+                suffix=" m" onChange={v => patchOptions({roadWidth:v})} />}
+            {selected?.kind === 'city' &&
+              <Range label="Sidewalk width" min={.5} max={5} step={.25} value={config.options.sidewalkWidth ?? 2}
+                suffix=" m" onChange={v => patchOptions({sidewalkWidth:v})} />}
+            {selected && !['road','city'].includes(selected.kind) && <>
+              <button className="disclosure" onClick={() => setShowDimensions(x => !x)} aria-expanded={showDimensions}>
+                Dimensions <span>{showDimensions ? '−' : '+'}</span>
+              </button>
+              {showDimensions && <div className="dimension-grid">
+                {(['width','depth','height'] as const)
+                  .filter(key => key !== 'height' || selected.kind === 'asset' || selected.kind === 'sidewalk')
+                  .map(key => <label key={key}>{key === 'width' && selected.kind === 'sidewalk' ? 'Length' : friendly(key)}
+                    <input type="number" min="0.01" step="0.05" placeholder={selected.dimensions?.[key]?.toString() ?? 'Default'}
+                      value={config.options[key] ?? ''} onChange={e => patchOptions({[key]: clampDimension(e.target.value)})} />
+                  </label>)}
+                <p>Leave blank to use the factory default.</p>
+              </div>}
+            </>}
           </section>
-          <section className="panel"><h3>Palette</h3>
+          {selected && ['asset','shophouse','shophouse-row','sidewalk'].includes(selected.kind) && <section className="panel"><h3>Palette</h3>
             {(['primaryColor','secondaryColor'] as const).map((key, i) => <div className="color-field" key={key}>
               <label htmlFor={key}>{i === 0 ? 'Primary' : 'Secondary'}</label>
               <div className="color-input"><input id={key} type="color" value={config.options[key]}
@@ -127,7 +146,7 @@ export function LightingRoom() {
             <div className="swatches" aria-label="Pastel palette">{palette.map(color => <button key={color}
               style={{backgroundColor:color}} title={color} aria-label={'Use ' + color + ' as primary color'}
               onClick={() => patchOptions({primaryColor:color})} />)}</div>
-          </section>
+          </section>}
           <section className="panel"><h3>Lighting</h3>
             <label htmlFor="lighting-preset">Preset</label>
             <select id="lighting-preset" value={config.lighting.preset}

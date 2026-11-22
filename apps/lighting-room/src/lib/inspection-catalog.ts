@@ -37,6 +37,7 @@ const assemblies: InspectionEntry[] = [
   {
     id:'assembly/shophouse', name:'Shophouse', category:'assemblies',
     kind:'shophouse', placement:'floor', variants:['cafe','retail','office'],
+    dimensions:{width:3.6,depth:5.8,height:7.87},
     async create(o) {
       const {createShophouse}=await import('@three-shell/world-composition');
       return createShophouse({
@@ -49,6 +50,7 @@ const assemblies: InspectionEntry[] = [
   {
     id:'assembly/shophouse-row', name:'Shophouse Row', category:'assemblies',
     kind:'shophouse-row', placement:'floor', variants:['mixed','cafe','retail','office'],
+    dimensions:{width:11.08,depth:5.8,height:7.87},
     async create(o) {
       const {createShophouseRow}=await import('@three-shell/world-composition');
       const shop=o.variant==='mixed'||!o.variant?undefined:o.variant as 'cafe'|'retail'|'office';
@@ -62,6 +64,7 @@ const assemblies: InspectionEntry[] = [
   {
     id:'assembly/sidewalk', name:'Sidewalk Segment', category:'assemblies',
     kind:'sidewalk', placement:'floor', variants:['front','back'],
+    dimensions:{width:4,depth:2,height:.115},
     async create(o) {
       const {createSidewalkSegment}=await import('@three-shell/world-composition');
       return createSidewalkSegment({

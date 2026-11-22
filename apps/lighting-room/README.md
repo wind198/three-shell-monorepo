@@ -1,6 +1,6 @@
 # Asset Lighting Room
 
-A Next.js visual workbench built on the **existing ThreeShell scene architecture**. It previews a single low-poly asset at a time; it is not a world composer.
+A Next.js visual workbench built on the **existing ThreeShell scene architecture**. It previews one primitive asset **or one reusable assembly** at a time; it is not an interactive world editor.
 
 ## Run
 
@@ -16,7 +16,8 @@ Open http://localhost:3001.
 
 ## Features
 
-- Search/select implemented assets from the imported architecture factory snapshot.
+- Search/select implemented assets from the imported architecture factory snapshot, plus reusable assemblies from `world-composition`.
+- Preview shophouse, shophouse row, sidewalk segment, road cross and city cross; inspect assembly-specific floors, counts and road dimensions.
 - Select typed variants, optionally override dimensions, and tune primary/secondary colors.
 - Studio/daylight/warm/neutral lighting presets, live key and ambient light controls.
 - Orbit, pan, zoom, XYZ rotation, auto-rotation, ground/grid and shadow controls.
@@ -43,7 +44,8 @@ reviewed and committed so the app's sources stay reproducible.
 - SceneState owns renderer, camera, lights, controls and floor resources.
 - AssetState owns current group and its **instance-specific materials**, but not factory module-level geometry.
 - Scene operators handle loading, lighting, camera and rendering.
-- One mounted scene/renderer persists when switching asset factories.
+- One mounted scene/renderer persists when switching asset or assembly factories.
+- Assembly factories are loaded lazily from `@three-shell/world-composition`; no independent SceneModule is needed.
 - Factory errors are surfaced in the toolbar instead of crashing the rendering loop.
 
 ## Limitations
@@ -51,4 +53,5 @@ reviewed and committed so the app's sources stay reproducible.
 - No WebGL-based screenshots or comparisons yet.
 - No automatic upstream Git synchronization; source snapshot is versioned.
 - A few upstream factories may have their own geometry/material ownership rules.
+- Assembly inspect options are intentionally curated rather than inferred from arbitrary function signatures.
 - Standard pipeline renders continuously; render-on-demand can be introduced after visual validation.
