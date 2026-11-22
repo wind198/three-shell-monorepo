@@ -1,8 +1,8 @@
 import { Injectable } from '@three-shell/core';
-import { SceneResources } from '../resources/scene-resources';
+import { SceneState } from '../state/scene.state';
 
 @Injectable()
 export class CameraOperator {
-  constructor(private readonly resources: SceneResources) {}
+  constructor(private readonly resources: SceneState) {}
   update(): void { this.resources.controls.update(); }
 }

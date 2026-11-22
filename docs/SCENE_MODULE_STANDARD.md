@@ -1,55 +1,51 @@
-# SceneModule standard
+# Scene module standard
 
-A **SceneModule is one complete scene**. `CoffeeShopSceneModule` is one scene; `PhysicsOperator` is not a scene module. Use `@Module` (alias `@SceneModule` retained for compatibility) to declare the scene's DI providers and explicit exports.
+A **SceneModule represents exactly one complete scene**. The directory topology is implementation-agnostic. Three.js, a physics engine, and the rendering host are implementation details; they do not determine scene directories.
 
-## Mandatory files
+## Structure
 
 ```text
 scenes/<scene-name>/
-  <scene-name>.module.ts     # Module composition: providers, imports, exports
-  <scene-name>.scene.ts      # Extends ThreeShell; explicit simulation/presentation pipelines
+  <scene-name>.module.ts       # DI providers and exports
+  <scene-name>.scene.ts        # Pipeline orchestration only
+  <scene-name>.mount.ts        # Optional consuming-host bindings
+  operators/                  # Stateless cohesive behaviors/capabilities
+  state/                      # Stateful providers, registries and owned resources
+  entities/                   # Entity models, interfaces and object definitions
 ```
 
-## Optional responsibility-oriented directories
+`operators/`, `state/` and `entities/` are the standard conceptual directories; create only those needed. There is no mandatory `index.ts`, `resources/`, `physics/`, `services/` or `contracts/`. The scene may also have `tests/` and `assets/` where required.
 
-| Path | Role | Rules |
+## Responsibilities
+
+| Layer | Owns | Must not own |
 |---|---|---|
-| `operators/` | Cohesive classes exposing multiple pipeline methods | Methods execute in the order chosen by Scene; do not start separate frame loops |
-| `entities/` | Runtime object models/identities and related types | Per-entity objects are not DI providers |
-| `state/` | Persistent scene state shared across stages | One authoritative owner for each mutable value |
-| `assets/` | Scene-local manifests and load policies | Actual binary assets may belong to app public storage |
-| `<responsibility>/` | Precise mechanisms such as `physics/`, `navigation/`, `resources/` | Name for what it owns, not for generic type of class |
-| `tests/` | Tests of scene composition and behavior | Isolate frame logic from browser when possible |
+| Module | Provider registration, imports and explicit DI exports | Operational logic |
+| Scene | Composition and order of lifecycle, simulation and presentation steps | Scene-wide mutable state and behavioral implementation |
+| Operators | Cohesive actions and domain/technical behavior | Authoritative mutable state, independent frame loops |
+| State | Runtime state, registries, resources, cleanup and their lifetimes | Cross-capability orchestration |
+| Entities | Per-object definitions, interfaces and object-local behavior | Scene-wide orchestration |
 
-For React consumers, `@three-shell/react` exposes `createSceneView(...)`. Call the factory once in the consuming React UI module, passing a lazy scene loader; it returns a JSX component. **Do not create or generate per-scene `*.view.tsx` files**. The loader supplies runtime host tokens and the canvas container through DI. The factory handles stable mounting and forwards current props through `getProps`.
+### Operator naming
 
-No mandatory `index.ts`, `services/`, `contracts/`, `common/`, or `types/`. Colocate types with their relevant classes. Import providers from their real paths. `@Module.exports` determines DI visibility, **not** TypeScript import access.
+Name each operator for its **responsibility**, not the lifecycle stage where it is called. Examples in a coffee shop: `camera.operator.ts`, `physics.operator.ts`, `navigation.operator.ts`, `customer.operator.ts`, `barista.operator.ts`, `interaction.operator.ts`, `render.operator.ts`. Both domain and technical capabilities are valid. Avoid generic `initialize.operator.ts`, `update.operator.ts`, and `dispose.operator.ts` and avoid splitting one cohesive operator by lifecycle method.
 
-## DI and lifecycle
+An operator can expose multiple named operations (e.g. `PhysicsOperator.capturePreviousTransforms`, `simulate`, `synchronizeTransforms`). Operators can mutate state and perform effects, but must not retain mutable execution state across frames. Inject state providers rather than storing counters, registries or resources on operators.
 
-```ts
-@Module({
-  providers: [CoffeeShopScene, MovementOperator, SceneState],
-  exports: [CoffeeShopScene],
-})
-export class CoffeeShopSceneModule {}
-```
+### State ownership
 
-`@Injectable()` enables automatic constructor parameter type reflection. Interface, runtime host, or other non-class dependencies must use `@Inject(TOKEN)` with host-supplied tokens. TypeScript legacy decorators, `emitDecoratorMetadata`, and `reflect-metadata` are required. Detect missing and circular dependencies at bootstrap.
+State providers own mutable scene data and external engine objects. Examples: `scene.state.ts` owns the renderer and camera, `physics.state.ts` owns the simulation world, and `entity.registry.ts` owns entity instances. Use explicit lifecycle hooks to dispose owned resources; clean up in reverse dependency order. State methods for registry operations and safe cleanup are permitted, but business decisions and pipeline ordering stay in operators/Scene respectively.
 
-Frame scheduling belongs to the framework; rendering/physics resources belong to the scene's implementation. Initialization and destruction hooks own resource lifetime. Scene and operators never perform DI lookups per frame.
+### Scene composition
 
-## Generator
+The Scene extends `ThreeShell`, injects operators, and connects their **named methods** through `pipe`. It must not implement spawning, simulation, rendering, or metrics calculations. The current core contract requires `getAnimationHost()`; this may return a state-owned animation host without transferring ownership to Scene.
 
-```bash
-pnpm scene:new CoffeeShop --root apps/playground-next
-pnpm scene:new Warehouse --root apps/playground-next --with operators,entities,state,assets,tests
-pnpm scene:new Blank --root apps/playground-next --with none --dry-run
-pnpm scene:list --root apps/playground-next
-```
+`@Module.exports` controls DI visibility, not TypeScript module exports. Individual entity instances are not DI providers. Constructor DI uses `@Injectable()`; host/runtime inputs use `@Inject(TOKEN)` and `useValue`.
 
-Use `--scenes-dir` to target a different application-relative scene directory. Generator does not edit application bootstrap or existing modules; wire new scene selection explicitly. No automatic scene registration or lifecycle guessing.
+## React/Next integration
 
-## Automatic discovery in Next.js
+Mount scenes through the discovered generated registry using `<SceneView scene="slug" />`. `<scene>.mount.ts` is optional for host-supplied tokens; do not create per-scene `*.view.tsx` wrappers. Scene registration is automatic via `withThreeShell()`.
 
-Use `withThreeShell()` in Next config to discover scenes on dev/build startup and watch them in development. Mount with `<SceneView scene="coffee-shop" />` from the generated registry. No `scene:sync`, `predev`, or manual loader registration is required. The CLI is optional for scaffolding.
+## CLI
+
+`pnpm scene:new CoffeeShop --root apps/playground-next` scaffolds an initial scene. Add responsibility-named operators and state providers as needed; generated placeholder operations are only scaffolding, not the naming convention. `pnpm scene:list --root apps/playground-next` lists discovered scenes.

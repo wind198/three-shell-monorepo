@@ -1,28 +1,26 @@
 # ThreeShell architecture
 
-- **Framework (`packages/core`)**: NestJS-style module metadata, constructor DI, provider lifecycle, `ThreeApplication`, `ThreeShell`, synchronous `pipe`, fixed-step `SimulationRuntime`.
-- **Scene (`apps/*/src/scenes/<scene>`)**: a self-contained SceneModule. Scene extends `ThreeShell` and explicitly composes operator methods. Operators group related behavior; entities and state are app-owned. Technical implementation directories must be named for their responsibility.
-- **Host (`apps/*`)**: provides animation host (e.g., `WebGLRenderer.setAnimationLoop`) and external constructor tokens. React/Next.js only mounts/disposes; never updates per-frame entities.
-- **CLI (`tools/scene-cli`)**: no framework runtime dependency; safe, repeatable, collision-rejecting scene scaffolding.
+- **Core (`packages/core`)**: module-scoped DI, provider lifecycle, `ThreeApplication`, `ThreeShell`, synchronous `pipe`, fixed-step `SimulationRuntime`. No Three.js, physics or React dependency.
+- **Scene (`apps/*/src/scenes/<slug>`)**: one scene module; a thin scene orchestrator declares fixed-step simulation and presentation ordering through named operator methods.
+- **Operators (`operators/`)**: stateless, responsibility-named capability classes. They perform effects and update state but do not own mutable runtime state or run independent animation loops.
+- **State (`state/`)**: scene-owned mutable objects, registries, graphics/physics resources and their cleanup. Provider lifecycle hooks initialize and dispose resources safely.
+- **Entities (`entities/`)**: per-object interfaces, runtime models and object-local behavior.
+- **Host**: browser/React/Next adapters supply mount tokens and start or stop the animation host. The consuming app owns its rendering/physics implementations.
 
 ## Dependency direction
 
 ```text
-apps/playground-next ──> @three-shell/core
-  ├─ scene-owned Three.js resources
-  ├─ scene-owned Rapier world
-  └─ scene-owned behavior operators
-
-tools/scene-cli ──> Node.js standard library (development time only)
-@three-shell/core ──> reflect-metadata
+SceneModule -> Scene -> Operators -> State -> Entities
+                   \                /
+                    -> State (animation host binding)
 ```
 
-DI metadata supports constructor class tokens. A runtime value (canvas element, callback or animation host) uses `@Inject(TOKEN)` and `useValue`. Module `exports` scopes DI, not file import visibility. A SceneModule defines exactly one scene; sharing provider graphs between scenes should be explicit rather than automatic.
+This is a conceptual responsibility flow, not a restriction that entities cannot reference engine types. Operators may depend directly on entity types. Implementation details belong inside operators/state and do not create top-level directories such as `resources/` or `physics/`.
 
-## React integration (optional)
+## Demo
 
-`@three-shell/react` supplies `createSceneView(load)` and the lower-level `<SceneView load={...} />` with asynchronous client-only bootstrap and disposal. The playground uses `createSceneView(...)` directly from `Dashboard.tsx`; no `demo.view.tsx` exists. CLI scaffolds only the scene module, scene class, and selected technical directories; it never generates JSX wrappers. Rendering and physics dependencies stay in the consuming app.
+`demo.module.ts` registers the scene and its capability/state providers. `demo.scene.ts` only wires operator calls, timing, animation host and error delegation. `state/scene.state.ts` owns graphics resources; `state/physics.state.ts` owns Rapier; `state/entity.registry.ts` maintains objects; `state/metrics.state.ts` stores reporting counters. Spawning, physics, camera, rendering and metrics remain stateless operators.
 
-## Automatic discovery in Next.js
+## React / Next discovery
 
-Use `withThreeShell()` in Next config to discover scenes on dev/build startup and watch them in development. Mount with `<SceneView scene="coffee-shop" />` from the generated registry. No `scene:sync`, `predev`, or manual loader registration is required. The CLI is optional for scaffolding.
+`@three-shell/react` provides `createSceneView` and `SceneView`. `@three-shell/next` discovers scene modules at dev/build time with `withThreeShell()` and generates `src/scenes/.generated/registry`. Consumers render `<SceneView scene="demo" />`; per-scene JSX wrappers are unnecessary.
