@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { add, group, place, rotate } from '@three-shell/core/assembly';
+import { add, group as createGroup, place, rotate } from '@three-shell/core/assembly';
 import type { CityCrossDocument, CityCrossOptions } from '../types';
 import { box, matte, PALETTE, positive, streetLamp, tree, whole } from '../primitives';
 import { createSidewalkSegment } from './sidewalk';
@@ -48,7 +48,7 @@ export function createCityCross(options: CityCrossOptions = {}): THREE.Group {
   // They face the nearby roadway; north blocks rotate 180 degrees.
   for (const zSide of [-1,1]) {
     for (const xSide of [-1,1]) {
-      const block = group('Block-'+(zSide>0?'North':'South')+'-'+(xSide>0?'East':'West'));
+      const block = createGroup('Block-'+(zSide>0?'North':'South')+'-'+(xSide>0?'East':'West'));
       block.userData.template = 'city-block';
       place(block, xSide*xCenter, 0, zSide*zCenter);
       const sidewalk = createSidewalkSegment({
