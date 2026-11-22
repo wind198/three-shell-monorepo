@@ -26,3 +26,13 @@ A static, editable **city-cross** preset comprising four corner blocks, shophous
 - Only one Three.js renderer and one RAF pipeline per mounted scene. Asset materials are disposed on rebuild; shared immutable geometries are not.
 
 This MVP is a **static composition workbench**, not a complete drag/drop city editor. Physics, traffic, pedestrians and arbitrary-node manipulation are intentionally out of scope.
+
+## Inside Shophouse Coffee Shop
+
+Open [http://localhost:3002/coffee-shop](http://localhost:3002/coffee-shop). A second
+auto-discovered ThreeShell Scene reuses the existing renderer/camera/operator classes,
+and mounts the `createInsideShophouse()` assembly from `world-composition`.
+Architecture is roof-open with a cutaway right side for interior inspection.
+Reusable café furniture factories live in `world-assets/src/interior/cafe.ts`.
+The inspector controls table count, lounge, decorations, and lighting; the scene tree
+can highlight furniture sections. No additional package or application was created.

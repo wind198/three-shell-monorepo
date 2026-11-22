@@ -1,7 +1,8 @@
-import type { CityCrossOptions } from '@three-shell/world-composition';
+import type { CityCrossOptions, InsideShophouseOptions } from '@three-shell/world-composition';
 export type TimeOfDay = 'day' | 'golden-hour' | 'evening';
 export interface ComposerConfig {
   city: CityCrossOptions;
+  coffee: InsideShophouseOptions;
   selection: string;
   environment: { time: TimeOfDay; showGrid: boolean; shadows: boolean };
 }
@@ -11,6 +12,7 @@ export const DEFAULT_CONFIG: ComposerConfig = {
    buildingWidth: 3.6, buildingDepth: 5.8, buildingGap: .14,
    floors: 3, showStreetFurniture: true,
  },
+ coffee:{width:7.5,depth:10,height:3.75,tableCount:3,showLounge:true,showDecor:true},
  selection: '',
  environment: { time: 'day', showGrid: false, shadows: true },
 };

@@ -21,3 +21,13 @@ describe('city cross preset document',()=>{
   }
  });
 });
+
+describe('coffee-shop scene registry',()=>{
+ it('has an independently mounted scene with its own module and host providers',()=>{
+  const fs=readFileSync(resolve('src/scenes/inside-shophouse/inside-shophouse.module.ts'),'utf8');
+  const mount=readFileSync(resolve('src/scenes/inside-shophouse/inside-shophouse.mount.ts'),'utf8');
+  expect(fs).toContain('InsideShophouseSceneModule');
+  expect(mount).toContain('createMountProviders');
+  expect(DEFAULT_CONFIG.coffee.tableCount).toBe(3);
+ });
+});

@@ -1,5 +1,6 @@
 'use client';
 import { useRef, useState } from 'react';
+import Link from 'next/link';
 import type { ChangeEvent } from 'react';
 import { SceneView } from '@/scenes/.generated/registry';
 import { DEFAULT_CONFIG, BLOCK_NAMES, type ComposerConfig, type TimeOfDay } from '@/lib/config';
@@ -74,6 +75,7 @@ export function WorldComposer() {
   <header className="topbar">
    <div className="brand"><span className="mark">◈</span><strong>THREESHELL</strong><span className="crumb"> / World Composer</span></div>
    <div className="actions">
+    <Link href="/coffee-shop" className="scene-link">Inside Shophouse Coffee Shop</Link>
     <input ref={fileInput} type="file" accept=".json,application/json" className="hidden" aria-label="Import city JSON" onChange={importScene}/>
     <button onClick={()=>fileInput.current?.click()}>Import JSON</button>
     <button onClick={exportScene} className="primary">Export JSON</button>

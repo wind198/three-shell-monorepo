@@ -3,5 +3,5 @@ import { fileURLToPath } from 'node:url';
 import { syncSceneRegistry } from '../../../packages/next/src/discovery.mjs';
 const root = resolve(fileURLToPath(new URL('.', import.meta.url)), '..');
 const report = syncSceneRegistry({ root });
-if (report.scenes.length !== 1 || report.scenes[0] !== 'city-cross') throw new Error('Expected one city-cross scene');
+if (report.scenes.join(',') !== 'city-cross,inside-shophouse') throw new Error('Expected city-cross and inside-shophouse scenes');
 console.log('[world-composer] generated scene registry');
